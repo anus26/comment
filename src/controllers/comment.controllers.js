@@ -1,16 +1,27 @@
 
 import { Comment } from "../modules/comment.modules.js"
-const createComment=async(request,response)=>{
-    const {comment,userId,postId}=request.body
-    if(!comment)return response.status(400).json({message:"comment required"})
-const newComment=await Comment.create({
+const createComment=async(req,res)=>{
+    const {comment,userId,postId}=req.body
+    if(!comment)return res.status(400).json({message:"comment required"})
+        if (!userId) return res.status(400).json({ message: "User ID is required" });
+    if (!postId) return res.status(400).json({ message: "Post ID is required" });
+ // Create a new comment document
+ const newComment = new Comment({
     comment,
-    postId:request.userId,
-    
-})
-response.status(201).json({
+    enrolleduserdId: userId,
+
+    postId,
+});
+const savedComment = await newComment.save();
+res.status(201).json({
     message:"added comment",
-    data:newComment
+    comment:savedComment,
+    comment,
+    userId,
+    postId
+    
+   
+
 })
 }
 
