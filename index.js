@@ -10,6 +10,8 @@ import bcrypt from "bcrypt"
 import commentRoutes from "./src/routes/comment.routes.js";
 import userRoutes from "./src/routes/user.routes.js"
 import postRoutes from "./src/routes/post.routes.js"
+import likeRoutes from "./src/routes/like.routes.js"
+import sharerouter from './src/routes/share.routes.js'
 
 
    
@@ -69,6 +71,8 @@ app.post("/checkedtoken",(req,res)=>{
 app.use('/api/v1',commentRoutes);
 app.use('/api/v1',userRoutes);
 app.use('/api/v1',postRoutes)
+app.use('/api/v1',likeRoutes)
+app.use('/api/v1',sharerouter)
 connectDB()
   .then(() => {
     app.listen(process.env.PORT, () => {

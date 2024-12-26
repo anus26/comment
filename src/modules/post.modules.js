@@ -17,6 +17,12 @@ const PostSchema=new mongoose.Schema({
     ref:"Users",
     required:true
   },
+  like:[
+    {
+      type:mongoose.Schema.Types.ObjectId,
+      ref:'Like',
+    }
+  ]
 },
   {
     timestamps:true
