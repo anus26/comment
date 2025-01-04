@@ -49,21 +49,18 @@ const generateAccessToken = (user) => {
 const generateRefreshToken = (user) => {
     return jwt.sign({ email: user.email }, process.env.REFRESH_JWT_TOKEN_SECRET, { expiresIn: '7d' });
 }
-// registerUser
 const registerUser = async (req, res) => {
-    const { email, password } = req.body
-    //     if (!user) return res.status(400).json({message:"email is requried"})
-    //    if (!password) return res.status(400).json({message:"password is requried"}) 
-
-    const user = await User.findOne({ email: email })
-    if (user) return res.status(409).json({ message: "user already exicts" })
+    const { email, password } = req.body;
+    if (!email) return res.status(400).json({ message: "email required" });
+    if (!password) return res.status(400).json({ message: "password required" });
+    const user = await User.findOne({ email: email });
+    if (user) return res.status(401).json({ message: "user already exist" });
     const createUser = await User.create({
-        email,
-        password,
-
-    })
-    res.json({ message: "user register successfully", data: createUser })
-}
+      email,
+      password,
+    });
+    res.json({ message: "user registered successfully", data: createUser });
+  };
 // login user
 const longinUser = async (req, res) => {
     const { email, password } = req.body

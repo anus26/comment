@@ -1,7 +1,6 @@
 import dotenv from "dotenv";
 dotenv.config();
 import express from "express"
-
 import connectDB from "./src/db/index.js"
 import cors  from "cors"
 import cookieParser  from 'cookie-parser'
@@ -74,6 +73,7 @@ app.use('/api/v1',postRoutes)
 app.use('/api/v1',likeRoutes)
 app.use('/api/v1',sharerouter)
 connectDB()
+
   .then(() => {
     app.listen(process.env.PORT, () => {
       console.log(`⚙️  Server is running at port : ${process.env.PORT}`);

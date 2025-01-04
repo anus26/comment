@@ -10,4 +10,10 @@ const sharepost=async (req,res)=>{
         res.status(201).json({ message:'mesaage successfully', newshare:Share});
       }
 
+      
+
+
+
+
+
 export {sharepost}

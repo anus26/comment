@@ -87,6 +87,19 @@ const createPost=async(req,res)=>{
       
   }
 } 
+const shareget=async(req,res)=>{
+  const {title,content,userId,url}=req.body
+  res.status(201).json({message:"data successfully",
+    title,
+    url,
+    content,
+    userId,
 
 
-export {createPost}
+  })
+} 
+
+
+
+
+export {createPost,shareget}
