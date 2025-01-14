@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-
+import Users from "../modules/user.modules.js"
 const PostSchema=new mongoose.Schema({
   title:{
     type:String,
@@ -12,9 +12,9 @@ const PostSchema=new mongoose.Schema({
   imageUrl:{
     type:String
   },
-  createby:{
+  userRef:{
     type:mongoose.Schema.Types.ObjectId,
-    ref:"Users",
+    ref:Users,
     required:true
   },
   like:[

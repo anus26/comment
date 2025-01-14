@@ -1,11 +1,12 @@
 import express from "express";
-import { createPost, shareget } from "../controllers/post.controllers.js";
+import {  addPost } from "../controllers/post.controllers.js";
 import { upload } from "../middleware/multer.middleware.js";
+import { authenticate } from "../middleware/userRef.middleware.js";
 
 const router = express.Router();
 
 // Correct field name for Multer
-router.post("/post", upload.single("image"), createPost);
-router.get("/share",shareget)
+router.post("/post",authenticate, upload.single("image"), addPost);
+
 export default router;
 

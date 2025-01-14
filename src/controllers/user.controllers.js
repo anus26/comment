@@ -1,9 +1,10 @@
 import User from "../modules/user.modules.js";
-
+// import { authenticatonUser } from "../middleware/user.middleware.js";
 import jwt from 'jsonwebtoken'
 
 import bcrypt from "bcrypt";
 import nodemailer from "nodemailer" 
+import path from "path";
 // nodemailer
 
 const transporter = nodemailer.createTransport({
@@ -72,8 +73,12 @@ const longinUser = async (req, res) => {
     if (!isPasswordValid) return res.status(404).json({ message: "is not valid password" })
 
     const accessToken = generateAccessToken(user)
+    
     const refreshToken = generateRefreshToken(user);
-    res.cookie("refreshToken", refreshToken, { http: true, secure: false })
+    res.cookie("refreshToken", refreshToken, {   httpOnly: true,
+        secure: true,
+        sameSite: "None",
+      });
     res.json({
         message: "user login successfully",
         accessToken,
@@ -85,7 +90,8 @@ const longinUser = async (req, res) => {
 // logout user
 
 const logoutUser = async (req, res) => {
-    res.clearCookie("refreshToken")
+    res.clearCookie("accessToken",{path:'/'})
+    res.clearCookie("refreshToken",{path:'/'})
     res.json({ message: "user logout successfully" })
 
 }
@@ -103,18 +109,18 @@ const refreshToken = async (req, res) => {
 }
 
 // middleware
-const authenticatonUser = (req, res, next) => {
-    const token = req.header["authorizaton"]
-    if (!token) return res.stauts(404).json({ message: "not found" })
-    jwt.verify(token, process.env.ACCESS_JWT_TOKEN_SECRET, (err, user) => {
-        if (err) return res.status(403).json({
-            message: "invalid "
-        })
-        req.user = user;
-        next()
+// const authenticatonUser = (req, res, next) => {
+//     const token = req.header["authorizaton"]
+//     if (!token) return res.stauts(404).json({ message: "not found" })
+//     jwt.verify(token, process.env.ACCESS_JWT_TOKEN_SECRET, (err, user) => {
+//         if (err) return res.status(403).json({
+//             message: "invalid "
+//         })
+//         req.user = user;
+//         next()
 
-    })
-}
+//     })
+// }
 
 
   
@@ -140,4 +146,4 @@ const authenticatonUser = (req, res, next) => {
      
     
 
-export { registerUser, longinUser, logoutUser, refreshToken, authenticatonUser,sendTestemail }
+export { registerUser, longinUser, logoutUser, refreshToken, sendTestemail }
