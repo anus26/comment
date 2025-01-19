@@ -57,14 +57,14 @@ const addPost = async (req, res) => {
     }
 
     // Create the post
-    await Post.create({
+     const newPost=await Post.create({
       title,
       content,
        imageUrl: uploadResult,
       userRef: userRef._id,
     });
  
-    return res.status(201).json({ message: "Post created successfully", data:Post });
+    return res.status(201).json({ message: "Post created successfully", data:newPost });
   } catch (error) {
     console.error("Error occurred:", error);
     res.status(500).json({ message: "An error occurred while creating the post" });
@@ -95,7 +95,7 @@ const getPostById = async (req, res) => {
       const post = await Post.findById();
       
       if (!post) {
-        return res.status(404).json({ message: "Post not found" }); // If post doesn't exist
+        return res.status(404).json({ message: "Post not found",data:post }); // If post doesn't exist
       }
       
       return res.status(200).json({ message: "Post found successfully", data: post }); // Return the found post
@@ -106,24 +106,35 @@ const getPostById = async (req, res) => {
   
   // Update a post
 const updatePost = async (req, res) => {
+  const { id } = req.params; 
+  const { title, content } = req.body; 
+  if (!id) {
+    return res.status(400).json({ message: "post ID is required." });
+}
+  if (!title && !content && !req.file) {
+    return res.status(400).json({ message: "Please provide at least one field to update (title, content, or image)." });}
+    if (!req.user) {
+      return res.status(401).json({ message: "You need to log in first." });
+  }
   try {
-    const { id } = req.params; // Extract ID from request parameters
-    const { title, content } = req.body; // Extract fields from request body
-
-    // Build update object dynamically to allow partial updates
-    const updateData = {};
-    if (title) updateData.title = title;
-    if (content) updateData.content = content;
-    if (imageUrl) updateData.imageUrl = imageUrl;
-
-    // Attempt to find and update the post
-    const post = await Post.findByIdAndUpdate(id, updateData, { new: true });
+    let updateFields={}
+    if (req.file) {
+      const uploadResult = await uploadImageToCloudinary(req.file.path);
+      if (!uploadResult) {
+        return res.status(500).json({ message: "Image upload failed" });
+      }
+      updateFields.imageUrl=uploadResult
+    }
+    const post = await Post.findByIdAndUpdate(id,{title:title||undefined,
+      content:content||undefined,
+      
+    }, { new: true });
 
     if (!post) {
       return res.status(404).json({ message: "Post not found" }); // Post not found
     }
 
-    res.status(200).json({ message: "Post updated successfully", data: post });
+    res.status(200).json({ message: "Post updated successfully", post:updatePost });
   } catch (error) {
     console.error("Error updating post:", error);
     res.status(500).json({ message: "Error updating post", error: error.message });

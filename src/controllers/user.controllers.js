@@ -73,12 +73,14 @@ const longinUser = async (req, res) => {
     if (!isPasswordValid) return res.status(404).json({ message: "is not valid password" })
 
     const accessToken = generateAccessToken(user)
+
     
     const refreshToken = generateRefreshToken(user);
     res.cookie("refreshToken", refreshToken, {   httpOnly: true,
         secure: true,
         sameSite: "None",
       });
+      
     res.json({
         message: "user login successfully",
         accessToken,
