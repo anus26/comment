@@ -17,10 +17,10 @@ const PostSchema=new mongoose.Schema({
     ref:Users,
     required:true
   },
-  like:[
+  LikeId:[
     {
       type:mongoose.Schema.Types.ObjectId,
-      ref:'Like',
+      ref:"User",
     }
   ]
 },
