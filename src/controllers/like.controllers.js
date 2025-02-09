@@ -62,5 +62,18 @@ const LikePost = async (req, res) => {
   }
 };
 
-export { LikePost };
+
+
+const getLikeall=async(req,res)=>{
+  try {
+    const like =await post.find()
+    return res.status(200).json({message:"like received successfully",data:like})
+
+  } catch (error) {
+    console.error("error fetching",error);
+    res.status(500).json({message:"fecting error"})
+    
+  }
+}
+export { LikePost ,getLikeall};
 

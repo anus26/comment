@@ -72,20 +72,43 @@ const addPost = async (req, res) => {
 };
 
 // getpost
-const allPost =async(req,res)=>{
- 
+const allPost = async (req, res) => {
   try {
+    const accessToken = req.headers.authorization?.split(" ")[1]; // Get token
+    let userId = null;
 
-  const post = await Post.find()
-    if (!post) {
-      return res.status(404).json({ message: "Post not found" });
-      
+    if (accessToken) {
+      try {
+        const decoded = jwt.verify(accessToken, process.env.ACCESS_JWT_TOkEN_SECRET);
+        const user = await User.findOne({ email: decoded.email });
+        if (user) {
+          userId = user._id.toString();
+        }
+      } catch (error) {
+        console.error("Invalid token:", error);
+      }
     }
-    return res.status(200).json({ message: "Post found successfully", data:post })
+
+    const posts = await Post.find();
+
+    if (!posts || posts.length === 0) {
+      return res.status(404).json({ message: "No posts found" });
+    }
+
+    const postsWithLikes = posts.map((post) => ({
+      ...post.toObject(),
+      isLiked: post.LikeId.includes(userId),
+      likedCount: post.LikeId.length,
+    }));
+
+    return res.status(200).json({ message: "Posts found successfully", data:postsWithLikes, });
+
   } catch (error) {
-    res.status(500).json({message:"fetching error"})
+    console.error("Error fetching posts:", error);
+    res.status(500).json({ message: "Fetching error" });
   }
-}
+};
+
 
 // get by Id
 const getPostById = async (req, res) => {
