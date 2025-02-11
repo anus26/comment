@@ -13,7 +13,7 @@ import likeRoutes from "./src/routes/like.routes.js"
 import sharerouter from './src/routes/share.routes.js'
 
 const corsOptions = {
-  origin: "",
+  origin: "*",
   
   credentials: true,
 };
