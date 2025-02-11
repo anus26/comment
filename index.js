@@ -1,8 +1,8 @@
 import dotenv from "dotenv";
 dotenv.config();
 import express from "express"
-import connectDB from "./src/db/index.js"
 import cors  from "cors"
+import connectDB from "./src/db/index.js"
 import cookieParser  from 'cookie-parser'
 import jwt from "jsonwebtoken"
 import bcrypt from "bcrypt"
@@ -13,7 +13,8 @@ import likeRoutes from "./src/routes/like.routes.js"
 import sharerouter from './src/routes/share.routes.js'
 
 const corsOptions = {
-  origin: 'https://comment-react.vercel.app',
+  origin: "",
+  
   credentials: true,
 };
    
