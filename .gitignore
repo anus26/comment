@@ -1,2 +1,3 @@
 .envnp
 node_modules
+.vercel
