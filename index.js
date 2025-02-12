@@ -12,16 +12,10 @@ import postRoutes from "./src/routes/post.routes.js"
 import likeRoutes from "./src/routes/like.routes.js"
 import sharerouter from './src/routes/share.routes.js'
 
-const corsOptions = {
-  origin: "*",
-  
-  credentials: true,
-};
    
 const app = express();
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser())
 const JWT_TOKEN_SECRET=process.env.JWT_TOKEN_SECRET
 
