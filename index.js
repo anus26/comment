@@ -15,12 +15,22 @@ import postRoutes from "./src/routes/post.routes.js";
 import likeRoutes from "./src/routes/like.routes.js";
 import shareRoutes from "./src/routes/share.routes.js";
 
+
+
 // Initialize Express App
 const app = express();
 
 
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:5173", // Allow frontend URL
+  credentials: true, // Allow cookies to be sent
+  methods: "GET,POST,PUT,DELETE", // Allowed methods
+  allowedHeaders: "Content-Type,Authorization" // Allowed headers
+}));
 
+  // Handle preflight requests
+ 
+  
 
 
 app.use(express.json());
