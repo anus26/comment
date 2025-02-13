@@ -8,34 +8,47 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import connectDB from "./src/db/index.js";
 
+
+
+
+const app = express();
+
+const corsOptions = {
+  origin: ["http://localhost:5173", "https://comment-d0ompwbbv-anusrazas-projects.vercel.app"],
+  credentials: true, // Cookies allow karega
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+// Initialize Express App
+
+// Apply CORS middleware
+app.use(cors(corsOptions));
+
+// Ensure preflight requests are handled
+// ✅ Global Middleware for Headers & Preflight Handling
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Credentials", "true");
+  
+  // Handle preflight requests
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+  
+  next();
+});  
+
+
+app.use(express.json());
+app.use(cookieParser());
 // Import Routes
 import commentRoutes from "./src/routes/comment.routes.js";
 import userRoutes from "./src/routes/user.routes.js";
 import postRoutes from "./src/routes/post.routes.js";
 import likeRoutes from "./src/routes/like.routes.js";
 import shareRoutes from "./src/routes/share.routes.js";
-
-
-
-// Initialize Express App
-const app = express();
-
-
-app.use(cors({
-  origin: ["http://localhost:5173", "https://comment-pow28yp2y-anusrazas-projects.vercel.app"], 
-  credentials: true, 
-  methods: "GET,POST,PUT,DELETE", 
-  allowedHeaders: ["Content-Type", "Authorization"]
-}));
-
-
-  // Handle preflight requests
-  app.options("*", cors());
-  
-
-
-app.use(express.json());
-app.use(cookieParser());
 
 // Environment Variables
 const PORT = process.env.PORT || 4000;
