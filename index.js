@@ -22,11 +22,12 @@ const app = express();
 
 
 app.use(cors({
-  origin: "http://localhost:5173", // Allow frontend URL
-  credentials: true, // Allow cookies to be sent
-  methods: "GET,POST,PUT,DELETE", // Allowed methods
-  allowedHeaders: "Content-Type,Authorization" // Allowed headers
+  origin: ["http://localhost:5173", "https://your-frontend.vercel.app"], 
+  credentials: true, 
+  methods: "GET,POST,PUT,DELETE", 
+  allowedHeaders: "Content-Type,Authorization"
 }));
+
 
   // Handle preflight requests
  
