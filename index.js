@@ -22,7 +22,7 @@ const app = express();
 
 
 app.use(cors({
-  origin: ["http://localhost:5173", "https://your-frontend.vercel.app"], 
+  origin: ["http://localhost:5173", "https://comment-pow28yp2y-anusrazas-projects.vercel.app"], 
   credentials: true, 
   methods: "GET,POST,PUT,DELETE", 
   allowedHeaders: "Content-Type,Authorization"
@@ -30,7 +30,7 @@ app.use(cors({
 
 
   // Handle preflight requests
- 
+  app.options("*", cors());
   
 
 
