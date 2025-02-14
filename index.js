@@ -14,7 +14,11 @@ import sharerouter from './src/routes/share.routes.js'
 
    
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: "https://comment-react.vercel.app",  // Sabhi origins allow karein (for testing only)
+  credentials: true 
+}));
+
 app.use(express.json());
 app.use(cookieParser())
 const JWT_TOKEN_SECRET=process.env.JWT_TOKEN_SECRET

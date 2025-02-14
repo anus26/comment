@@ -2,10 +2,7 @@ import jwt from "jsonwebtoken";
 import userModules from "../modules/user.modules.js";
 
 export const authenticate = async (req, res, next) => {
-    if (req.methd === "OPTIONS") {
-        return next()
-        
-    }
+   
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith("Bearer")) {
