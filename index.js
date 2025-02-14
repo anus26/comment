@@ -1,133 +1,82 @@
 import dotenv from "dotenv";
-dotenv.config(); // Ensure environment variables are loaded
-
-import express from "express";
-import cors from "cors";
-import cookieParser from "cookie-parser";
-import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
-import connectDB from "./src/db/index.js";
-
-
-
-
-const app = express();
-
-const corsOptions = {
-  origin: ["http://localhost:5173", "https://comment-d0ompwbbv-anusrazas-projects.vercel.app"],
-  credentials: true, // Cookies allow karega
-  methods: ["GET", "POST", "PUT", "DELETE"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-};
-// Initialize Express App
-
-// Apply CORS middleware
-app.use(cors(corsOptions));
-
-// Ensure preflight requests are handled
-// ✅ Global Middleware for Headers & Preflight Handling
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", req.headers.origin || "*");
-  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  res.header("Access-Control-Allow-Credentials", "true");
-  
-  // Handle preflight requests
-  if (req.method === "OPTIONS") {
-    return res.sendStatus(200);
-  }
-  
-  next();
-});  
-
-
-app.use(express.json());
-app.use(cookieParser());
-// Import Routes
+dotenv.config();
+import express from "express"
+import cors  from "cors"
+import connectDB from "./src/db/index.js"
+import cookieParser  from 'cookie-parser'
+import jwt from "jsonwebtoken"
+import bcrypt from "bcrypt"
 import commentRoutes from "./src/routes/comment.routes.js";
-import userRoutes from "./src/routes/user.routes.js";
-import postRoutes from "./src/routes/post.routes.js";
-import likeRoutes from "./src/routes/like.routes.js";
-import shareRoutes from "./src/routes/share.routes.js";
+import userRoutes from "./src/routes/user.routes.js"
+import postRoutes from "./src/routes/post.routes.js"
+import likeRoutes from "./src/routes/like.routes.js"
+import sharerouter from './src/routes/share.routes.js'
 
-// Environment Variables
-const PORT = process.env.PORT || 4000;
-const JWT_SECRET = process.env.ACCESS_JWT_TOKEN_SECRET;
+   
+const app = express();
+app.use(cors());
+app.use(express.json());
+app.use(cookieParser())
+const JWT_TOKEN_SECRET=process.env.JWT_TOKEN_SECRET
 
-// Database Connection
+app.get("/",(req,res)=>{
+res.send("hello world")
+})
+console.log("Mongo URI:", process.env.MONGO_URI);
+
+const  encryptpassword = "$2b$10$GYOgdCP7o8xn2czJ2VSiKedYc2x6abHpmcPqSLJ2L4EXwc8D1hkH."
+const token="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFudXNyYXphMjY1QGdtYWlsLmNvbSIsImlhdCI6MTczMzc5OTczNX0.0jbEMLel_5Kr3ZfBUnpWt51S-P33Hxl1lJOd-gwpt0o"
+// encrpt password
+app.post("/encryptpassword",(req,res)=>{
+    const {password}=req.body
+    
+        bcrypt.hash(password, 10, function(err, hash) {
+            // Store hash in your password DB.
+            if(err)return res.status(402).json({message:"password not correct"})
+                res.json({password:hash})
+            });
+            
+          })
+         app.post("/checkedpassword",(req,res)=>{
+            const {password}=req.body
+            bcrypt.compare(password, encryptpassword, function(err, result) {
+              if(err) return res.status(402).json({message:"error"})
+                if(result) return res.json({message:"password is correct"})
+   res.status(404).json({message:"incorrect password"})
+})   // checkedpassword
+        ;
+ })
+// genreatetoken
+app.post("/genreatetoken",(req,res)=>{
+    const {email}=req.body
+    const token = jwt.sign({email },JWT_TOKEN_SECRET ,);
+    res.json(token)
+})
+
+// checkedtokend
+app.post("/checkedtoken",(req,res)=>{
+  jwt.verify(token, process.env.JWT_TOKEN_SECRET, function(err, decoded) {
+    if(err) return res.json({message:"error occured"})
+    console.log(decoded) // bar
+  res.json(decoded)
+  });
+})
+
+
+
+
+app.use('/api/v1',commentRoutes);
+app.use('/api/v1',userRoutes);
+app.use('/api/v1',postRoutes)
+app.use('/api/v1',likeRoutes)
+app.use('/api/v1',sharerouter)
 connectDB()
-  .then(() => console.log("✅ MongoDB Connected"))
+
+  .then(() => {
+    app.listen(process.env.PORT, () => {
+      console.log(`⚙️  Server is running at port : ${process.env.PORT}`);
+    });
+  })
   .catch((err) => {
-    console.error("❌ MongoDB connection failed:", err);
-    process.exit(1); // Stop server if DB connection fails
+    console.log("MongoDB connection failed!!!", err);
   });
-
-// Default Route
-app.get("/", (req, res) => {
-  res.send("Hello World from Serverless Function");
-});
-
-// Encrypt Password
-app.post("/encryptpassword", async (req, res) => {
-  try {
-    const { password } = req.body;
-    if (!password) return res.status(400).json({ message: "Password is required" });
-
-    const hash = await bcrypt.hash(password, 10);
-    res.json({ password: hash });
-  } catch (error) {
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-});
-
-// Check Password
-app.post("/checkedpassword", async (req, res) => {
-  try {
-    const { password } = req.body;
-    const encryptedPassword = "$2b$10$GYOgdCP7o8xn2czJ2VSiKedYc2x6abHpmcPqSLJ2L4EXwc8D1hkH.";
-
-    const match = await bcrypt.compare(password, encryptedPassword);
-    if (match) return res.json({ message: "Password is correct" });
-
-    res.status(400).json({ message: "Incorrect password" });
-  } catch (error) {
-    res.status(500).json({ message: "Internal Server Error" });
-  }
-});
-
-// Generate Token
-app.post("/genreatetoken", (req, res) => {
-  const { email } = req.body;
-  if (!email) return res.status(400).json({ message: "Email is required" });
-
-  const token = jwt.sign({ email }, JWT_SECRET, { expiresIn: "1h" });
-  res.json({ token });
-});
-
-// Verify Token
-app.post("/checkedtoken", (req, res) => {
-  const { token } = req.body;
-  if (!token) return res.status(400).json({ message: "Token is required" });
-
-  jwt.verify(token, JWT_SECRET, (err, decoded) => {
-    if (err) return res.status(401).json({ message: "Invalid Token" });
-    res.json(decoded);
-  });
-});
-
-// API Routes
-app.use("/api/v1", commentRoutes);
-app.use("/api/v1", userRoutes);
-app.use("/api/v1", postRoutes);
-app.use("/api/v1", likeRoutes);
-app.use("/api/v1", shareRoutes);
-
-// Start Server (For Local Development)
-if (process.env.NODE_ENV !== "production") {
-  app.listen(PORT, () => {
-    console.log(`⚙️ Server is running at port: ${PORT}`);
-  });
-}
-
-// Export for Vercel Serverless Function
-export default app;
