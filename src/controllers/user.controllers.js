@@ -63,7 +63,7 @@ const registerUser = async (req, res) => {
     res.json({ message: "user registered successfully", data: createUser });
   };
 // login user
-const longinUser = async (req, res) => {
+const loginUser = async (req, res) => {
     const { email, password } = req.body
     if (!email) return res.status(400).json({ message: "email is required" })
     if (!password) return res.status(400).json({ message: "password is required" })
