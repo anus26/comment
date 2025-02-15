@@ -26,14 +26,14 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser())
 const JWT_TOKEN_SECRET=process.env.JWT_TOKEN_SECRET
-const PORT=4000
+
 app.get("/",(req,res)=>{
 res.send("hello world")
 })
 console.log("Mongo URI:", process.env.MONGO_URI);
 
 const  encryptpassword = "$2b$10$GYOgdCP7o8xn2czJ2VSiKedYc2x6abHpmcPqSLJ2L4EXwc8D1hkH."
-const token="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFudXNyYXphMjY1QGdtYWlsLmNvbSIsImlhdCI6MTczMzc5OTczNX0.0jbEMLel_5Kr3ZfBUnpWt51S-P33Hxl1lJOd-gwpt0o"
+const token="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImFzaWY3ODZAZ21haWwuY29tIiwiaWF0IjoxNzM5NTkwNDg3fQ.-WxJeIGrPYWgjIBe5hBeDqsv5feWR9Lg1OajmapNUlM"
 // encrpt password
 app.post("/encryptpassword",(req,res)=>{
     const {password}=req.body
@@ -57,13 +57,13 @@ app.post("/encryptpassword",(req,res)=>{
 // genreatetoken
 app.post("/genreatetoken",(req,res)=>{
     const {email}=req.body
-    const token = jwt.sign({email },JWT_TOKEN_SECRET ,);
+    const token = jwt.sign({email },process.env.ACCESS_JWT_TOKEN_SECRET ,);
     res.json(token)
 })
 
 // checkedtokend
 app.post("/checkedtoken",(req,res)=>{
-  jwt.verify(token, process.env.JWT_TOKEN_SECRET, function(err, decoded) {
+  jwt.verify(token, process.env.ACCESS_JWT_TOKEN_SECRET, function(err, decoded) {
     if(err) return res.json({message:"error occured"})
     console.log(decoded) // bar
   res.json(decoded)
@@ -82,7 +82,7 @@ connectDB()
 
   .then(() => {
     app.listen(process.env.PORT, () => {
-      console.log(`⚙️  Server is running at port : ${PORT}`);
+      console.log(`⚙️  Server is running at port : ${process.env.PORT}`);
     });
   })
   .catch((err) => {
