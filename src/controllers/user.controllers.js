@@ -148,4 +148,4 @@ const refreshToken = async (req, res) => {
      
     
 
-export { registerUser, longinUser, logoutUser, refreshToken, sendTestemail }
+export { registerUser, loginUser, logoutUser, refreshToken, sendTestemail }
