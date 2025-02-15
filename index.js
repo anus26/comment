@@ -15,13 +15,12 @@ import sharerouter from './src/routes/share.routes.js'
    
 const app = express();
 app.use(cors({
-  origin: "https://comment-react.vercel.app",  // Sabhi origins allow karein (for testing only)
-
+  origin: ["https://comment-react.vercel.app"],  
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
-
-  credentials: true 
+  credentials: true
 }));
+
 
 app.use(express.json());
 app.use(cookieParser())
