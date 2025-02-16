@@ -15,13 +15,20 @@ import sharerouter from './src/routes/share.routes.js'
    
 const app = express();
 app.use(cors({
-  origin: ["https://comment-react.vercel.app"],  // Sabhi origins allow karein (for testing only)
+  origin: "https://comment-react.vercel.app",  // Sabhi origins allow karein (for testing only)
 
   methods: ["GET", "POST", "PUT", "DELETE","OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
 
   credentials: true 
 }));
+app.options("*", (req, res) => {
+  res.header("Access-Control-Allow-Origin", "https://comment-react.vercel.app");
+  res.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type,Authorization");
+  res.header("Access-Control-Allow-Credentials", "true");
+  res.status(200).send();
+});
 
 app.use(express.json());
 app.use(cookieParser())
@@ -56,13 +63,13 @@ app.post("/encryptpassword",(req,res)=>{
 // genreatetoken
 app.post("/genreatetoken",(req,res)=>{
     const {email}=req.body
-    const token = jwt.sign({email },process.env.ACCESS_JWT_TOKEN_SECRET ,);
+    const token = jwt.sign({email },process.env.JWT_TOKEN_SECRET ,);
     res.json(token)
 })
 
 // checkedtokend
 app.post("/checkedtoken",(req,res)=>{
-  jwt.verify(token, process.env.ACCESS_JWT_TOKEN_SECRET, function(err, decoded) {
+  jwt.verify(token, process.env.JWT_TOKEN_SECRET, function(err, decoded) {
     if(err) return res.json({message:"error occured"})
     console.log(decoded) // bar
   res.json(decoded)
