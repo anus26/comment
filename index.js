@@ -24,7 +24,6 @@ app.use(cors({
 
 app.use(express.json());
 app.use(cookieParser())
-const JWT_TOKEN_SECRET=process.env.JWT_TOKEN_SECRET
 
 app.get("/",(req,res)=>{
 res.send("hello world")
