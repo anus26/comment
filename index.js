@@ -20,7 +20,8 @@ app.use(cors({
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true
 }));
-
+// Handle preflight requests properly
+app.options("*", cors()); 
 
 app.use(express.json());
 app.use(cookieParser())
