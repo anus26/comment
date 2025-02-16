@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 import express from "express"
-// import cors  from "cors"
+import cors  from "cors"
 import connectDB from "./src/db/index.js"
 import cookieParser  from 'cookie-parser'
 import jwt from "jsonwebtoken"
@@ -13,6 +13,7 @@ import likeRoutes from "./src/routes/like.routes.js"
 import sharerouter from './src/routes/share.routes.js'
 
    
+const app = express();
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "https://comment-react.vercel.app");
   res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
@@ -26,7 +27,7 @@ app.use((req, res, next) => {
   
   next();
 });
-
+app.use(cors());
 
 
 app.use(express.json());
