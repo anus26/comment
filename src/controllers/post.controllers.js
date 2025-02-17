@@ -1,15 +1,15 @@
 
-
 import { Post } from "../modules/post.modules.js";
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
+import jwt from "jsonwebtoken";
 
-// Configure Cloudinary
-cloudinary.config({
-  cloud_name: "dvryhevqf",
-  api_key: "499764812538244",
-  api_secret: "dZxyLgZPj9lWcMfajM6gTAGjGTc",
-});
+// // Configure Cloudinary
+// cloudinary.config({
+//   cloud_name: "dvryhevqf",
+//   api_key: "499764812538244",
+//   api_secret: "dZxyLgZPj9lWcMfajM6gTAGjGTc",
+// });
 
 // Function to upload an image to Cloudinary
 const uploadImageToCloudinary = async (localPath) => {
@@ -34,7 +34,7 @@ const addPost = async (req, res) => {
 
   try {
     // Upload image to Cloudinary
-    const uploadResult = await uploadImageToCloudinary(req.file.path);
+    const uploadResult = await req.file.path;
     if (!uploadResult) {
       return res.status(500).json({ message: "Image upload failed" });
     }
@@ -115,7 +115,7 @@ const getPostById = async (req, res) => {
   try {
       const id = req.params.id; // Extract the ID from route parameters
       // Find the post by its ID
-      const post = await Post.findById();
+      const post = await Post.findById(req.params.id);
       
       if (!post) {
         return res.status(404).json({ message: "Post not found",data:post }); // If post doesn't exist
@@ -142,7 +142,7 @@ const updatePost = async (req, res) => {
   try {
     let updateFields={}
     if (req.file) {
-      const uploadResult = await uploadImageToCloudinary(req.file.path);
+      const uploadResult = await req.file.path;
       if (!uploadResult) {
         return res.status(500).json({ message: "Image upload failed" });
       }
