@@ -1,8 +1,14 @@
 
 import { Post } from "../modules/post.modules.js";
-import { v2 as cloudinary } from "cloudinary";
+import  User  from "../modules/user.modules.js";
+
+// import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
 import jwt from "jsonwebtoken";
+import cloudinaryPkg from "cloudinary";
+const cloudinary = cloudinaryPkg.v2;
+
+
 
 // // Configure Cloudinary
 // cloudinary.config({
@@ -11,20 +17,20 @@ import jwt from "jsonwebtoken";
 //   api_secret: "dZxyLgZPj9lWcMfajM6gTAGjGTc",
 // });
 
-// Function to upload an image to Cloudinary
-const uploadImageToCloudinary = async (localPath) => {
-  try {
-    const uploadResult = await cloudinary.uploader.upload(localPath, {
-      resource_type: "auto",
-    });
-    fs.unlinkSync(localPath); // Delete the local file after upload
-    return uploadResult.url;
-  } catch (error) {
-    console.error("Cloudinary upload error:", error);
-    fs.unlinkSync(localPath); // Delete the local file even if upload fails
-    return null;
-  }
-};
+// // Function to upload an image to Cloudinary
+// const uploadImageToCloudinary = async (localPath) => {
+//   try {
+//     const uploadResult = await cloudinary.uploader.upload(localPath, {
+//       resource_type: "auto",
+//     });
+//     fs.unlinkSync(localPath); // Delete the local file after upload
+//     return uploadResult.url;
+//   } catch (error) {
+//     console.error("Cloudinary upload error:", error);
+//     fs.unlinkSync(localPath); // Delete the local file even if upload fails
+//     return null;
+//   }
+// };
 
 // Function to handle post creation
 const addPost = async (req, res) => {
@@ -140,24 +146,24 @@ const updatePost = async (req, res) => {
       return res.status(401).json({ message: "You need to log in first." });
   }
   try {
-    let updateFields={}
+   
+    const updateFields = {};
+    if (title) updateFields.title = title;
+    if (content) updateFields.content = content;
     if (req.file) {
-      const uploadResult = await req.file.path;
-      if (!uploadResult) {
-        return res.status(500).json({ message: "Image upload failed" });
-      }
-      updateFields.imageUrl=uploadResult
+      const uploadResult = await cloudinary.uploader.upload(req.file.path, { resource_type: "image" });
+      fs.unlinkSync(req.file.path);
+      updateFields.imageUrl = uploadResult.secure_url;
     }
-    const post = await Post.findByIdAndUpdate(id,{title:title||undefined,
-      content:content||undefined,
-      
-    }, { new: true });
-
+    
+    const post = await Post.findByIdAndUpdate(id, updateFields, { new: true });
+    
     if (!post) {
-      return res.status(404).json({ message: "Post not found" }); // Post not found
+      return res.status(404).json({ message: "Post not found" });
     }
-
-    res.status(200).json({ message: "Post updated successfully", post:updatePost });
+    
+    res.status(200).json({ message: "Post updated successfully", post });
+    
   } catch (error) {
     console.error("Error updating post:", error);
     res.status(500).json({ message: "Error updating post", error: error.message });
@@ -165,15 +171,20 @@ const updatePost = async (req, res) => {
 };
 
 
-const deletePost=async(req,res)=>{
+const deletePost = async (req, res) => {
   try {
-    const id=req.params.id
-    const post=await Post.findByIdAndDelete(id)
-    res.json({message:"post delete successfully",data:post})
+    const id = req.params.id;
+    const post = await Post.findById(id);
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+    await Post.findByIdAndDelete(id);
+    res.json({ message: "Post deleted successfully", data: post });
   } catch (error) {
-    res.json({message:"error fetching data"})
+    res.status(500).json({ message: "Error deleting post", error: error.message });
   }
-}
+};
+
 
 
 export { addPost ,allPost,getPostById,updatePost,deletePost};

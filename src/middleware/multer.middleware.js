@@ -11,7 +11,9 @@
 // export const upload = multer({ storage: storage });
 import multer from "multer";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
-import { v2 as cloudinary } from "cloudinary";
+import cloudinaryPkg from "cloudinary";
+
+const { v2: cloudinary } = cloudinaryPkg;
 
 cloudinary.config({
   cloud_name: "dvryhevqf",
