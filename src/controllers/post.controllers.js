@@ -151,9 +151,18 @@ const updatePost = async (req, res) => {
     if (title) updateFields.title = title;
     if (content) updateFields.content = content;
     if (req.file) {
+      if (post.imageUrl) {
+        // Extract Cloudinary public ID from URL
+        const publicId = post.imageUrl.split("/").slice(-1)[0].split(".")[0];
+
+        // Delete old image from Cloudinary
+        await cloudinary.uploader.destroy(publicId);
+      }
+
       const uploadResult = await cloudinary.uploader.upload(req.file.path, { resource_type: "image" });
-      fs.unlinkSync(req.file.path);
       updateFields.imageUrl = uploadResult.secure_url;
+      fs.unlinkSync(req.file.path);
+
     }
     
     const post = await Post.findByIdAndUpdate(id, updateFields, { new: true });
