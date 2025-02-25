@@ -134,17 +134,41 @@ const getPostById = async (req, res) => {
   };
   
   // Update a post
-
-  {message: 'Error updating post', error: 'The "path" argument must be of type string. Received an instance of Object'}
-  error
-  : 
-  "The \"path\" argument must be of type string. Received an instance of Object"
-  message
-  : 
-  "Error updating post"
-  [[Prototype]]
-  : 
-  Object
+const updatePost = async (req, res) => {
+  const { id } = req.params; 
+  const { title, content } = req.body; 
+  if (!id) {
+    return res.status(400).json({ message: "post ID is required." });
+}
+  if (!title && !content && !req.file) {
+    return res.status(400).json({ message: "Please provide at least one field to update (title, content, or image)." });}
+    if (!req.user) {
+      return res.status(401).json({ message: "You need to log in first." });
+  }
+  try {
+   
+    const updateFields = {};
+    if (title) updateFields.title = title;
+    if (content) updateFields.content = content;
+    if (req.file) {
+      const uploadResult = await cloudinary.uploader.upload(req.file.path, { resource_type: "image" });
+      fs.unlinkSync(req.file.path);
+      updateFields.imageUrl = uploadResult.secure_url;
+    }
+    
+    const post = await Post.findByIdAndUpdate(id, updateFields, { new: true });
+    
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+    
+    res.status(200).json({ message: "Post updated successfully", post });
+    
+  } catch (error) {
+    console.error("Error updating post:", error);
+    res.status(500).json({ message: "Error updating post", error: error.message });
+  }
+};
 
 
 const deletePost = async (req, res) => {
