@@ -151,8 +151,8 @@ const updatePost = async (req, res) => {
     if (title) updateFields.title = title;
     if (content) updateFields.content = content;
     if (req.file) {
-      const uploadResult = await cloudinary.uploader.upload(req.file.path, { resource_type: "image" });
-      fs.unlinkSync(req.file.path);
+      const uploadResult = await cloudinary.uploader.upload(req.file, { resource_type: "image" });
+      fs.unlinkSync(req.file);
       updateFields.imageUrl = uploadResult.secure_url;
     }
     
