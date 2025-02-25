@@ -145,6 +145,10 @@ const updatePost = async (req, res) => {
     if (!req.user) {
       return res.status(401).json({ message: "You need to log in first." });
   }
+  const post = await Post.findById(id);
+  if (!post) {
+    return res.status(404).json({ message: "Post not found" });
+  }
   try {
    
     const updateFields = {};
@@ -154,7 +158,10 @@ const updatePost = async (req, res) => {
 
     if (req.file) {
 
- 
+      if (post.imageUrl) {
+        const publicId = post.imageUrl.split("/").pop().split(".")[0];
+        await cloudinary.uploader.destroy(publicId);
+      }
 
       const uploadResult = await cloudinary.uploader.upload(req.file.path, { resource_type: "image" });
       updateFields.imageUrl = uploadResult.secure_url;
@@ -162,9 +169,9 @@ const updatePost = async (req, res) => {
 
     }
     
-    const post = await Post.findByIdAndUpdate(id, updateFields, { new: true });
+    const updatePost = await Post.findByIdAndUpdate(id, updateFields, { new: true });
     
-    if (!post) {
+    if (!updatePost) {
       return res.status(404).json({ message: "Post not found" });
     }
     
