@@ -150,12 +150,7 @@ const updatePost = async (req, res) => {
     const updateFields = {};
     if (title) updateFields.title = title;
     if (content) updateFields.content = content;
-    if (req.file && post.imageUrl) {
-      const imageUrlParts = post.imageUrl.split("/");
-      const publicId = imageUrlParts[imageUrlParts.length - 1].split(".")[0];
 
-      await cloudinary.uploader.destroy(publicId);
-    }
 
     if (req.file) {
 
@@ -163,7 +158,7 @@ const updatePost = async (req, res) => {
 
       const uploadResult = await cloudinary.uploader.upload(req.file.path, { resource_type: "image" });
       updateFields.imageUrl = uploadResult.secure_url;
-      fs.unlinkSync(req.file.path);
+    
 
     }
     
