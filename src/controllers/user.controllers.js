@@ -51,12 +51,14 @@ const generateRefreshToken = (user) => {
     return jwt.sign({ email: user.email }, process.env.REFRESH_JWT_TOKEN_SECRET, { expiresIn: '7d' });
 }
 const registerUser = async (req, res) => {
-    const { email, password } = req.body;
-    if (!email) return res.status(400).json({ message: "email required" });
+    const { email, password,name } = req.body;
+    if (!email ) return res.status(400).json({ message: "email required" });
     if (!password) return res.status(400).json({ message: "password required" });
+    if (!name) return res.status(400).json({ message: "name required" });
     const user = await User.findOne({ email: email });
     if (user) return res.status(409).json({ message: "user already exist" });
     const createUser = await User.create({
+        name,
       email,
       password,
     });
